@@ -18,12 +18,12 @@ trait HasToaster
 
     public function setStateMachine(IStateMachine $stateMachine)
     {
-        //We all love PHP "type system"
+        // We all love PHP "type system"
         if (! $stateMachine instanceof StateMachine) {
             throw new \LogicException("unexpected state machine type");
         }
 
-        $this->toaster = $stateMachine->toaster;
+        $this->toaster    = $stateMachine->toaster;
         $this->params     = $stateMachine->params;
     }
 }

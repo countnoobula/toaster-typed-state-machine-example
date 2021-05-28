@@ -28,6 +28,8 @@ class ToasterStateMachine extends StateMachine
      */
     public const TRANSITION_TURN_ON = 'turn_on';
     public const TRANSITION_TURN_OFF  = 'turn_off';
+    public const TRANSITION_SET_TEMP  = 'set_temperature';
+    public const TRANSITION_ADD_BREAD  = 'add_bread';
 
     public function __construct(Toaster $toaster, $params = [])
     {
@@ -40,9 +42,11 @@ class ToasterStateMachine extends StateMachine
      */
     public function getCurrentState(): State
     {
-        // if (is_null($this->toaster->id)) {
-        //     return new States\NotReady();
-        // }
+        if (is_null($this->toaster->id)) {
+            return new States\Unplugged();
+        }
+
+        // if ($this->toaster->has_bread && $this->toaster->has_power) {return States\TurnedOn;}
 
         return $this->guessStateClass($this->toaster->status);
     }
@@ -52,15 +56,17 @@ class ToasterStateMachine extends StateMachine
      */
     public function getEdges(): array
     {
-        // $allStates = [
-        //     new States\PowerOn(),
-        //     new States\PowerOff(),
-        // ];
+        // @todo - all states
 
         return (new EdgesBuilder())
-            // ->transition(new Transitions\TurnOn())
-            //    ->sources(new States\PowerOff())
-            //    ->target(new States\PowerOn())
+            ->transition(new Transitions\TurnOn())
+                ->sources(new States\PoweredOff())
+                ->target(new States\PoweredOn())
+            ->transition(new Transitions\TurnOff())
+                ->sources(new States\PoweredOn())
+                ->target(new States\PoweredOff())
+            ->transition(new Transitions\AddBread())
+                ->sources(new States\PoweredOff())
             ->build();
     }
 
